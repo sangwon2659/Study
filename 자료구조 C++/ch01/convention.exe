@@ -1,0 +1,17 @@
+# 1 "C:\\Users\\sangwon\\Desktop\\취업준비\\ㄱ스터디 - 코딩테스트\\자료구조 C++\\ch01\\convention.cpp"
+# 1 "C:\\Users\\sangwon\\Desktop\\취업준비\\ㄱ스터디 - 코딩테스트\\자료구조 C++\\ch01//"
+# 1 "<built-in>"
+# 1 "<command-line>"
+# 1 "C:\\Users\\sangwon\\Desktop\\취업준비\\ㄱ스터디 - 코딩테스트\\자료구조 C++\\ch01\\convention.cpp"
+class box{
+public:
+ int x,y,width,height;
+};
+int range_sum ( int a,int b )
+{
+ int sum=0;
+ for( int i=a ; i<= b ; i++ ){
+  sum+=i;
+ }
+ return sum;
+}
