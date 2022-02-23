@@ -422,6 +422,98 @@ public:
 	}
 };
 
+const int N = 6;
+bool gVisited[N] = {};
+void dfs_recursion(const vector<vector<int>>& adj_list, int s)
+{
+	if (gVisited[s])
+		return;
+
+	gVisited[s] = true;
+	cout << s << ", ";
+
+	for (int v : adj_list[s])
+		dfs_recursion(adj_list, v);
+}
+
+vector<int> dfs(const vector<vector<int>>& adj_list, int s)
+{
+	vector<bool> visited(adj_list.size(), false);
+	vector<int> visit_order;
+	stack<int> stk;
+	stk.push(s);
+
+	while (!stk.empty()) {
+		int v = stk.top();
+		stk.pop();
+
+		if (visited[v])
+			continue; // 이미 방문했으면 스킵!
+
+		visited[v] = true; // 정점 v를 방문
+		visit_order.push_back(v);
+
+		for (int a : adj_list[v]) {
+			if (!visited[a])
+				stk.push(a);
+		}
+	}
+
+	return visit_order;
+}
+
+vector<int> bfs(const vector<vector<int>>& adj_list, int s)
+{
+	vector<bool> visited(adj_list.size(), false);
+	vector<int> visit_order;
+	queue<int> q;
+	q.push(s);
+
+	while (!q.empty()) {
+		int v = q.front();
+		q.pop();
+
+		if (visited[v])
+			continue; // 이미 방문했으면 스킵!
+
+		visited[v] = true; // 정점 v를 방문
+		visit_order.push_back(v);
+
+		for (int a : adj_list[v]) {
+			if (!visited[a])
+				q.push(a);
+		}
+	}
+
+	return visit_order;
+}
+
+vector<int> memo(50, -1);
+
+int fibo_memoization(int n)
+{
+	if (n < 2)
+		return n;
+
+	if (memo[n] != -1)
+		return memo[n];
+	
+	memo[n] = fibo_memoization(n - 2) + fibo_memoization(n - 1);
+	return memo[n];
+}
+
+int fibo_tabulation(int n)
+{
+	vector<int> dp(n + 1, 0);
+	dp[1] = 1;
+
+	for (int i = 2; i <= n; i++)
+		dp[i] = dp[i - 2] + dp[i - 1];
+
+	return dp[n];
+}
+
+
 int main()
 {
     //////////////////Vector//////////////////
@@ -630,9 +722,9 @@ int main()
     int target = 40;
     //이진탐색은 std::binary_search 존재 (bool type)
     //비교 함수 comp를 마지막 매개변수로 지정할 수도 있음
-    cout << binary_search(v__.begin(), v__.end(), target) << endl;
+    //cout << binary_search(v__.begin(), v__.end(), target) << endl;
     cout << endl;
-
+    
     /////////////////Binary Tree & BST//////////////////
     cout << "//////////////////Binary Tree & BST//////////////////" << endl;
     //트리 자체에 대한 용어 
@@ -648,14 +740,15 @@ int main()
     //Full/정 이진 트리: (자식노드가 0개 또는 2개), Perfect/포화: (자식노드 모두 2개),  
     //Complete/완전: (왼쪽부터 완전히 채워진), Balanced/균형: (모든 노드의 서브트리 간의 높이 차이가 1이하),
     //Skewed/편향: (리프 노드를 제외한 모든 노드가 하나의 자식 노드만 갖는)
-    //순회 알고리즘: DFS & BFS (순회라는 건 정해진 순서에 의해 트리의 모든 노드를 한번씩 방문하는 작업)
+    //순회 알고리즘: Depth or Breadth First (순회라는 건 정해진 순서에 의해 트리의 모든 노드를 한번씩 방문하는 작업)
+    //Traversal과 Search 혼용해도 무관
     //Depth First Search:
     //전위 순회 (preorder traversal)
     //중위 순회 (inordeer traversal)
     //후위 순회 (postorder traversal)
     //Breadth First Search:
     //레벨 순서 순회 (level order traversal)
-    //탐색은 DFS or BFS 방식에 따라 하고, 삽입은 아무대나 하고, 삭제도 delete만 하면 됨 
+    //탐색은 Depth or Breadth 방식에 따라 하고, 삽입은 아무대나 하고, 삭제도 delete만 하면 됨 
     	/*
 	    A
 	 B     C
@@ -957,12 +1050,109 @@ int main()
 
     //////////////////Graph//////////////////
     cout << "//////////////////Graph//////////////////" << endl;
+    //객체 간의 연결 관계를 표현할 수 있는 비선형 자료구조
+    //G = (V, E) [V: 정점, Vertex, Node // E: 에지, 간선, Edge, Link]
+    //그래프 관련 용어
+    //가중치(Weight): Edge에 부여된 수치
+    //차수(Degree): 정점에 연결된 다른 정점의 개수
+    //경로(Path): 특정 정점에서 다른 정점으로 이동하는 방법을 인접 정점의 나열로 표현한 것
+    //사이클(Cycle): 시작 정점과 마지막 정점이 같은 단순 경로 (트리는 사이클이 없는 그래프)
 
+    //그래프 표현방법
+    //1.인접행렬(Adjacency Matrix)
+    //정점 개수가 N인 경우 NxN 행렬을 만들어서
+    //adj[u][v]에 따라 간선이 있거나(무방향 그래프) 갈 수 있는지 없는지(방향 그래프) 1과 0을 통해 만들기
+    vector<vector<int>> adj_matrix = {
+        {0, 1, 0, 1, 1},
+        {1, 0, 1, 1, 1},
+        {1, 0, 0, 0, 0},
+        {1, 1, 1, 1, 1},
+        {1, 0, 1, 0, 1}
+    };
+    //2.인접 리스트
+    //각 정점에 인접한 정점들을 연결 리스트로 표현
+    //노드에 따라 간선이 있거나(무방향 그래프) 갈 수 있는지 없는지(방향 그래프)를 기준으로 원소를 추가하는 방식으로 구성
+    //실제로 연결 리스트를 쓰는 것보다는 그냥 vector를 사용하는 게 편해서 그렇게 구성함
+	vector<vector<int>> adj_list = {
+		{1, 3, 4},
+		{0, 2, 4},
+		{1, 5},
+		{0, 4},
+		{0, 1, 3},
+		{2}
+	};
+    //3.에지 리스트
+    //모든 에지를 배열로 표현
+    vector<vector<int>> edge_list = {
+        {0, 1}, {0, 3}, {0, 4},
+        {1, 0}, {1, 2}, {1, 4},
+        {2, 1},
+        {3, 1}, {3, 4},
+        {4, 1}, {4, 2}, {4, 3}
+    };
+
+    //그래프 순회
+    //Depth First Search
+    //현재 정점과 인접한 정점 중 하나를 선택하여 이동하는 과정을 반복하고,
+    //더 이상 이동할 정점이 없을 경우 뒤쪽으로 백트래킹(backtracking)하여 다시 이동할 경로를 탐색
+    //시작 정점으로부터 거리가 멀어지는(깊이가 깊어지는) 방식으로 탐색
+    //보통 재귀 또는 스택을 이용하여 구현
+	cout << "dfs_recursion: ";
+	dfs_recursion(adj_list, 0);
+	cout << endl;
+
+	auto dfs_order = dfs(adj_list, 0);
+	cout << "dfs_stack: ";
+	for (auto n : dfs_order)
+		cout << n << ", ";
+	cout << endl;
+
+    //Breadth First Search
+    //현재 정점과 인접한 모든 정점을 방문한 후,
+    //다시 이들 정점과 인접한 모든 정점을 찾아 방문하는 형식
+    //시작 정점으로부터 가까운 정점을 먼저 방문하고, 멀리 있는 정점을 나중에 방문
+    //보통 큐를 이용하여 구현
+    auto bfs_order = bfs(adj_list, 0);
+	cout << "bfs_queue: ";
+	for (auto n : bfs_order)
+		cout << n << ", ";
+	cout << endl;
     cout << endl;
 
     //////////////////Dynamic Programming//////////////////
     cout << "//////////////////Dynamic Programming//////////////////" << endl;
+    //복잡한 문제를 간단한 여러 개의 부분 문제(subproblem)로 나누고, 
+    //부분 문제에 대한 해답을 활용하여 전체 문제를 해결하는 문제 해결 방식
+    //분할 정복법(divide and conquer)에서는 분할된 부분 문제들이 서로 겹치지 않지만, 
+    //동적 계획법에서는 중복되는 부분 문제가 발생한다는 점이 다름
+    
+    //동적계획법 필요 조건
+    //1.중복되는 부분 문제(overlapping subproblems)
+    //주어진 문제를 여러 개의 부분 문제로 분할할 경우, 
+    //몇몇 부분 문제가 반복되어 나타나는 현상
+    //부분 문제의 솔루션을 저장하여 같은 부분 문제를 중복해서 계산하지 않도록 설정
+    //2.최적 부분 구조(optimal substructure)
+    //부문 문제의 최적해(optimal solution)를 조합하여 전체 문제의 최적해를 구할 수 있는 경우를 지칭
 
+    //동적 계획법 문제의 해결 방법
+    //기저 조건(base case) 정의
+    //상태 전환(state transition)을 나타내는 순환식 정의
+    //순환식을 메모이제이션(memoization) 또는 타뷸레이션(tabulation) 방식으로 풀이
+
+    //메모이제이션
+    //재귀 호출이 많이 발생하므로, 함수 호출에 따른 오버헤드(overhead)가 있음
+    //*오버헤드란 프로그램의 실행흐름 도중에 동떨어진 위치의 코드를 실행해야할 때, 추가적으로 시간,메모리,자원이 사용되는 현상
+    //경우에 따라 모든 부분 문제를 풀지 않아도 문제에 대한 해답을 구할 수 있음
+    //캐시로 사용하는 표의 일부만 필요에 따라 계산하여 채움
+
+    //타뷸레이션
+    //표(배열)에 저장된 값을 참조하는 방식이므로 빠르게 동작
+    //상향식(bottom-up) 방식이기 때문에 모든 부분 문제에 대한 해답을 구해서 표에 저장
+    //표의 맨 처음부터 끝까지 차례대로 계산하여 모두 채움
+
+    int n = 5;
+    cout << fibo_memoization(n) << endl;
+    cout << fibo_tabulation(n) << endl;
     cout << endl;
 
     //////////////////Extra//////////////////
